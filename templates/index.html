@@ -1,199 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3xUI Usage Checker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(270deg, #e0f7fa, #ffffff, #e0f7fa);
-      background-size: 600% 600%;
-      animation: gradientAnimation 15s ease infinite;
-      color: #333;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .container {
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px;
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      animation: fadeIn 0.8s ease-out;
-    }
-    .container:hover {
-      transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    }
-    h1 {
-      font-size: 2.6em;
-      font-weight: 600;
-      color: #0277bd;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .status-list {
-      list-style: none;
-      margin-bottom: 20px;
-      text-align: left;
-      padding: 0;
-    }
-    .status-list li {
-      margin: 4px 0;
-      font-size: 1em;
-    }
-    .status-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-    .online { background-color: #4caf50; }
-    .offline { background-color: #f44336; }
-    label {
-      font-size: 1.1em;
-      font-weight: 500;
-      margin-bottom: 8px;
-      display: block;
-      color: #555;
-      text-transform: uppercase;
-    }
-    input[type="text"], select {
-      width: 100%;
-      padding: 14px 16px;
-      margin-bottom: 20px;
-      border: 1px solid #b3e5fc;
-      border-radius: 8px;
-      font-size: 16px;
-      background-color: #f9fbfd;
-      color: #333;
-      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    input[type="text"]:focus, select:focus {
-      background-color: #e1f5fe;
-      outline: none;
-      border-color: #0288d1;
-      box-shadow: 0 0 8px rgba(2, 136, 209, 0.4);
-    }
-    button {
-      width: 100%;
-      padding: 15px;
-      background-color: #0288d1;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      overflow: hidden;
-      position: relative;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 4px 8px rgba(2, 136, 209, 0.3);
-    }
-    button:hover {
-      background-color: #0277bd;
-      transform: translateY(-3px) scale(1.02);
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(2, 136, 209, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(2, 136, 209, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(2, 136, 209, 0); }
-    }
-    button::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.4s ease, height 0.4s ease;
-      opacity: 0;
-    }
-    button:active::after {
-      width: 200%;
-      height: 200%;
-      opacity: 0;
-      transition: 0s;
-    }
-    .message-list {
-      margin-top: 20px;
-      padding: 0;
-      list-style: none;
-    }
-    .message-list li {
-      padding: 15px;
-      margin: 8px 0;
-      border-radius: 8px;
-      font-size: 1.1em;
-    }
-    .success { background-color: #d4edda; color: #155724; }
-    .error { background-color: #f8d7da; color: #721c24; }
-    .warning { background-color: #fff3cd; color: #856404; }
-    a {
-      color: #0288d1;
-      font-size: 1.1em;
-      text-decoration: none;
-      margin-top: 20px;
-      display: inline-block;
-      transition: color 0.3s ease;
-    }
-    a:hover { color: #0277bd; text-decoration: underline; }
-    footer { margin-top: 30px; font-size: 0.9em; color: #777; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (max-width: 600px) {
-      .container { padding: 30px 20px; }
-      h1 { font-size: 2.2em; }
-      label, input, select, button { font-size: 1em; }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">3XUI Usage Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            /* Light Mode Colors */
+            --background-start: #e0f7fa;
+            --background-end: #ffffff;
+            --text-color: #333;
+            --container-bg: #fff;
+            --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --section-bg: #f9fbfd;
+            --section-border: #b3e5fc;
+            --section-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --heading-color: #0288d1;
+            --paragraph-color: #555;
+            --icon-color: #0288d1;
+            --footer-color: #555;
+            --select-bg: #f9fbfd;
+            --select-border: #b3e5fc;
+            --select-text-color: #333;
+            --select-focus-border: #0288d1;
+            --switch-bg-off: #ccc;
+            --switch-bg-on: #2196F3;
+            --switch-slider-color: white;
+            /* Input form specific styles */
+            --input-border-form: #b3e5fc;
+            --input-bg-form: #f9fbfd;
+            --input-text-color-form: #333;
+            --button-bg-form: #0288d1;
+            --button-text-color-form: white;
+        }
+
+        body.dark-mode {
+            /* Dark Mode Colors */
+            --background-start: #2c3e50;
+            --background-end: #1a252f;
+            --text-color: #ecf0f1;
+            --container-bg: #34495e;
+            --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --section-bg: #2e4053;
+            --section-border: #4a627d;
+            --section-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --heading-color: #3498db;
+            --paragraph-color: #bdc3c7;
+            --icon-color: #3498db;
+            --footer-color: #bdc3c7;
+            --select-bg: #2e4053;
+            --select-border: #4a627d;
+            --select-text-color: #ecf0f1;
+            --select-focus-border: #3498db;
+            --switch-bg-off: #555;
+            --switch-bg-on: #3498db;
+            --switch-slider-color: #ecf0f1;
+            /* Input form specific styles for dark mode */
+            --input-border-form: #4a627d;
+            --input-bg-form: #2e4053;
+            --input-text-color-form: #ecf0f1;
+            --button-bg-form: #3498db;
+            --button-text-color-form: #ecf0f1;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(270deg, var(--background-start), var(--background-end), var(--background-start));
+            background-size: 600% 600%;
+            animation: gradientAnimation 15s ease infinite;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            background: var(--container-bg);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px; /* Adjusted for the form layout */
+            width: 100%;
+            box-shadow: var(--container-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative; /* For controls positioning */
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .section {
+            background-color: var(--section-bg);
+            border: 1px solid var(--section-border);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--section-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        h2 {
+            color: var(--heading-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+            transition: color 0.5s ease;
+        }
+        p {
+            font-size: 1.05em;
+            color: var(--paragraph-color);
+            transition: color 0.5s ease;
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .lang-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--select-border);
+            background-color: var(--select-bg);
+            color: var(--select-text-color);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.5s ease;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: var(--select-focus-border);
+        }
+
+        /* Corrected Theme Switch CSS */
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px; /* Adjusted width */
+            height: 28px; /* Adjusted height */
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg-off);
+            transition: .4s;
+            border-radius: 28px; /* Match height for rounded corners */
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; /* Slider circle size */
+            width: 20px; /* Slider circle size */
+            left: 4px; /* Initial position */
+            bottom: 4px; /* Initial position */
+            background-color: var(--switch-slider-color);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--switch-bg-on);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--switch-bg-on);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px); /* Adjust based on new width/height (width of track - width of slider - (2 * left/right padding)) */
+        }
+
+        .slider.round {
+            border-radius: 28px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        /* Form specific styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border-form);
+            background-color: var(--input-bg-form);
+            color: var(--input-text-color-form);
+            font-size: 1em;
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.5s ease;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--select-focus-border);
+            box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2); /* Example focus effect */
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--button-bg-form);
+            color: var(--button-text-color-form);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #0277bd; /* Slightly darker blue on hover */
+        }
+
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .message-list li {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .message-list li.error { background-color: #ffe0e0; color: #d32f2f; }
+        .message-list li.success { background-color: #e8f5e9; color: #388e3c; }
+        .message-list li.info { background-color: #e0f2f7; color: #0288d1; }
+        .message-list li.warning { background-color: #fff9c4; color: #fbc02d; }
+
+        body.dark-mode .message-list li.error { background-color: #d32f2f; color: #ffe0e0; }
+        body.dark-mode .message-list li.success { background-color: #388e3c; color: #e8f5e9; }
+        body.dark-mode .message-list li.info { background-color: #0288d1; color: #e0f2f7; }
+        body.dark-mode .message-list li.warning { background-color: #fbc02d; color: #fff9c4; }
+
+        footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--footer-color);
+            padding-top: 20px;
+
+            transition: color 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .controls {
+                top: 10px;
+                right: 10px;
+                gap: 10px;
+            }
+            .lang-select {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+            .theme-switch {
+                width: 48px; /* Adjusted width */
+                height: 28px; /* Adjusted height */
+            }
+            .slider:before {
+                height: 20px;
+                width: 20px;
+                left: 4px;
+                bottom: 4px;
+            }
+            input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>3xUI Usage Checker</h1>
-    <form method="POST">
-      <label for="email">Paste your V2Ray URL:</label>
-      <input type="text" id="email" name="email" required>
-      <button type="submit">Check Usage</button>
-    </form>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="message-list">
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <footer>Made with ❤️ by LeoX</footer>
-  </div>
+    <div class="controls">
+        <select id="language-select" class="lang-select">
+            <option value="en">English</option>
+            <option value="si">සිංහල</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="zh">简体中文</option>
+        </select>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2 id="formHeading">3XUI USAGE CHECKER</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="email" id="formLabel">PASTE YOUR V2RAY URL:</label>
+                    <input type="text" id="email" name="email" placeholder="vless://..." required />
+                </div>
+                {# The node selection dropdown has been removed as per your request. #}
+                <div class="form-group">
+                    <button type="submit" id="checkUsageButton">Check Usage</button>
+                </div>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="message-list">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <footer>
+            <p id="footerText">Made with ❤️ by LeoX</p>
+        </footer>
+    </div>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                pageTitle: "3XUI Usage Checker",
+                formHeading: "3XUI USAGE CHECKER",
+                formLabel: "PASTE YOUR V2RAY URL:",
+                checkUsageButton: "Check Usage",
+                footerText: "Made with ❤️ by LeoX",
+                successMessage: "Success: Your usage has been checked.", // Example Flask message
+                errorMessage: "Error: Could not check usage. Please try again.",
+                warningMessage: "Warning: Please enter a valid V2Ray URL.",
+                infoMessage: "Information: Your request is being processed."
+            },
+            si: {
+                pageTitle: "3XUI භාවිත පරීක්ෂක",
+                formHeading: "3XUI භාවිත පරීක්ෂක",
+                formLabel: "ඔබගේ V2Ray URL ඇතුලත් කරන්න:",
+                checkUsageButton: "භාවිතය පරීක්ෂා කරන්න",
+                footerText: "LeoX විසින් ❤️ සමඟින් සාදන ලදී",
+                successMessage: "සාර්ථකයි: ඔබගේ භාවිතය පරීක්ෂා කර ඇත.",
+                errorMessage: "දෝෂය: භාවිතය පරීක්ෂා කිරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+                warningMessage: "අනතුරු ඇඟවීම: වලංගු V2Ray URL එකක් ඇතුලත් කරන්න.",
+                infoMessage: "තොරතුරු: ඔබගේ ඉල්ලීම සකසමින් පවතී."
+            },
+            es: { // Spanish
+                pageTitle: "Verificador de Uso 3XUI",
+                formHeading: "VERIFICADOR DE USO 3XUI",
+                formLabel: "PEGUE SU URL DE V2RAY:",
+                checkUsageButton: "Verificar Uso",
+                footerText: "Hecho con ❤️ por LeoX",
+                successMessage: "Éxito: Su uso ha sido verificado.",
+                errorMessage: "Error: No se pudo verificar el uso. Inténtelo de nuevo.",
+                warningMessage: "Advertencia: Ingrese una URL de V2Ray válida.",
+                infoMessage: "Información: Su solicitud está siendo procesada."
+            },
+            de: { // German
+                pageTitle: "3XUI Nutzungsprüfer",
+                formHeading: "3XUI NUTZUNGSPRÜFER",
+                formLabel: "FÜGEN SIE IHRE V2RAY-URL EIN:",
+                checkUsageButton: "Nutzung prüfen",
+                footerText: "Mit ❤️ von LeoX erstellt",
+                successMessage: "Erfolg: Ihre Nutzung wurde überprüft.",
+                errorMessage: "Fehler: Nutzung konnte nicht überprüft werden. Bitte versuchen Sie es erneut.",
+                warningMessage: "Warnung: Bitte geben Sie eine gültige V2Ray-URL ein.",
+                infoMessage: "Information: Ihre Anfrage wird bearbeitet."
+            },
+            fr: { // French
+                pageTitle: "Vérificateur d'Utilisation 3XUI",
+                formHeading: "VÉRIFICATEUR D'UTILISATION 3XUI",
+                formLabel: "COLLEZ VOTRE URL V2RAY:",
+                checkUsageButton: "Vérifier l'utilisation",
+                footerText: "Fait avec ❤️ par LeoX",
+                successMessage: "Succès: Votre utilisation a été vérifiée.",
+                errorMessage: "Erreur: Impossible de vérifier l'utilisation. Veuillez réessayer.",
+                warningMessage: "Avertissement: Veuillez entrer une URL V2Ray valide.",
+                infoMessage: "Information: Votre demande est en cours de traitement."
+            },
+            zh: { // Simplified Chinese
+                pageTitle: "3XUI 使用情况检查器",
+                formHeading: "3XUI 使用情况检查器",
+                formLabel: "粘贴您的 V2Ray URL:",
+                checkUsageButton: "检查使用情况",
+                footerText: "由 LeoX 用 ❤️ 制作",
+                successMessage: "成功: 您的使用情况已检查。",
+                errorMessage: "错误: 无法检查使用情况。请重试。",
+                warningMessage: "警告: 请输入有效的 V2Ray URL。",
+                infoMessage: "信息: 您的请求正在处理中。"
+            }
+        };
+
+        const languageSelect = document.getElementById('language-select');
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        // Function to set the language
+        function setLanguage(lang) {
+            document.getElementById('pageTitle').textContent = translations[lang].pageTitle;
+            document.getElementById('formHeading').textContent = translations[lang].formHeading;
+            document.getElementById('formLabel').textContent = translations[lang].formLabel;
+            document.getElementById('checkUsageButton').textContent = translations[lang].checkUsageButton;
+            document.getElementById('footerText').textContent = translations[lang].footerText;
+
+            // Update Flask flashed messages
+            const messageList = document.querySelector('.message-list');
+            if (messageList) {
+                messageList.querySelectorAll('li').forEach(li => {
+                    // This logic assumes Flask messages have a class like 'success', 'error', etc.
+                    // and you've set up corresponding messages in your Flask app.
+                    if (li.classList.contains('success')) {
+                        // Note: Flash messages are typically set server-side and don't dynamically translate on client-side language change unless you re-fetch.
+                        // This part might not be fully functional for already displayed messages without a page reload.
+                        // It's more illustrative of how you *would* target them if they were dynamic.
+                    } else if (li.classList.contains('error')) {
+                        // Same note as above
+                    }
+                    // ... handle other categories if necessary
+                });
+            }
+
+            localStorage.setItem('selectedLanguage', lang);
+        }
+
+        // Function to set the theme
+        function setTheme(isDarkMode) {
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved language
+            const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+            languageSelect.value = savedLanguage;
+            setLanguage(savedLanguage);
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('darkMode') === 'true';
+            themeToggle.checked = savedTheme;
+            setTheme(savedTheme);
+        });
+
+        // Event listener for language change
+        languageSelect.addEventListener('change', (event) => {
+            setLanguage(event.target.value);
+        });
+
+        // Event listener for theme toggle
+        themeToggle.addEventListener('change', (event) => {
+            setTheme(event.target.checked);
+        });
+    </script>
 </body>
 </html>

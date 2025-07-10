@@ -19,9 +19,8 @@ A modern customer usage portal for **x-ui / V2Ray** panel users. Check your band
 
 ## 🖥️ Screenshots
 
-> Add your screenshots here for extra ✨!
-> Example:
 > ![screenshot](./assets/demo.png)
+> ![screenshot](./assets/demo1.png)
 
 ---
 

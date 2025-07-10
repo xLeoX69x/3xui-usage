@@ -1,207 +1,680 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Client Usage Statistics</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(270deg, #e0f7fa, #ffffff, #e0f7fa);
-      background-size: 600% 600%;
-      animation: gradientAnimation 15s ease infinite;
-      color: #333;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .container {
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 1200px;
-      width: 100%;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-    .section {
-      background-color: #f9fbfd;
-      border: 1px solid #b3e5fc;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    h2 {
-      color: #0288d1;
-      font-weight: 600;
-      margin-bottom: 10px;
-      font-size: 1.4em;
-    }
-    p {
-      font-size: 1.05em;
-      color: #555;
-    }
-    p i {
-      color: #0288d1;
-      margin-right: 8px;
-    }
-    .chart-container {
-      width: 100%;
-    }
-    canvas {
-      width: 100% !important;
-      height: auto !important;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.9em;
-      color: #555;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-    }
-    @media (max-width: 768px) {
-      .container {
-        padding: 20px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">Client Usage Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            /* Light Mode Colors */
+            --background-start: #e0f7fa;
+            --background-end: #ffffff;
+            --text-color: #333;
+            --container-bg: #fff;
+            --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --section-bg: #f9fbfd;
+            --section-border: #b3e5fc;
+            --section-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --heading-color: #0288d1;
+            --paragraph-color: #555;
+            --icon-color: #0288d1;
+            --footer-color: #555;
+            --chart-legend-color: #555;
+            --chart-tooltip-bg: #333;
+            --select-bg: #f9fbfd;
+            --select-border: #b3e5fc;
+            --select-text-color: #333;
+            --select-focus-border: #0288d1;
+            --switch-bg-off: #ccc;
+            --switch-bg-on: #2196F3;
+            --switch-slider-color: white;
+        }
+
+        body.dark-mode {
+            /* Dark Mode Colors */
+            --background-start: #2c3e50;
+            --background-end: #1a252f;
+            --text-color: #ecf0f1;
+            --container-bg: #34495e;
+            --container-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --section-bg: #2e4053;
+            --section-border: #4a627d;
+            --section-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --heading-color: #3498db;
+            --paragraph-color: #bdc3c7;
+            --icon-color: #3498db;
+            --footer-color: #bdc3c7;
+            --chart-legend-color: #bdc3c7;
+            --chart-tooltip-bg: #1a252f;
+            --select-bg: #2e4053;
+            --select-border: #4a627d;
+            --select-text-color: #ecf0f1;
+            --select-focus-border: #3498db;
+            --switch-bg-off: #555;
+            --switch-bg-on: #3498db;
+            --switch-slider-color: #ecf0f1;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(270deg, var(--background-start), var(--background-end), var(--background-start));
+            background-size: 600% 600%;
+            animation: gradientAnimation 15s ease infinite;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            background: var(--container-bg);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: var(--container-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative; /* For controls positioning */
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .section {
+            background-color: var(--section-bg);
+            border: 1px solid var(--section-border);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--section-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        h2 {
+            color: var(--heading-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+            transition: color 0.5s ease;
+        }
+        p {
+            font-size: 1.05em;
+            color: var(--paragraph-color);
+            transition: color 0.5s ease;
+        }
+        p i {
+            color: var(--icon-color);
+            margin-right: 8px;
+            transition: color 0.5s ease;
+        }
+        .chart-container {
+            width: 100%;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--footer-color);
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            transition: color 0.5s ease;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+        }
+
+        /* Controls for Language & Theme */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .lang-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--select-border);
+            background-color: var(--select-bg);
+            color: var(--select-text-color);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.5s ease;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: var(--select-focus-border);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg-off);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--switch-slider-color);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--switch-bg-on);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--switch-bg-on);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="section">
-      <h2>Client Info</h2>
-      <p><i class="fas fa-envelope"></i><strong>Client Name:</strong> {{ client.email }}</p>
-      <p><i class="fas fa-id-badge"></i><strong>Node:</strong> {{ node }}</p>
-      <p><i class="fas fa-signal"></i><strong>Enabled:</strong> <span id="clientStatus">Loading...</span></p>
-      <p><i class="fas fa-rotate-right"></i><strong>Expire:</strong> <span id="expireTime" title="GMT +5.30"></span></p>
+    <div class="controls">
+        <select id="language-select" class="lang-select">
+            <option value="en">English</option>
+            <option value="si">සිංහල</option>
+            <option value="es">Español</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="zh">简体中文</option>
+        </select>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+        </label>
     </div>
-    <div class="section">
-      <h2>IP Info</h2>
-      <p><i class="fas fa-globe"></i><strong>IP Address:</strong> <span id="userIP">Detecting...</span></p>
-      <p><i class="fas fa-map-marker-alt"></i><strong>Country:</strong> <span id="userCountry">Detecting...</span></p>
+
+    <div class="container">
+        <div class="section">
+            <h2 id="clientInfoHeading">Client Info</h2>
+            <p><i class="fas fa-envelope"></i><strong id="clientNameLabel">Client Name:</strong> {{ client.email }}</p>
+            <p><i class="fas fa-id-badge"></i><strong id="nodeLabel">Node:</strong> {{ node }}</p>
+            <p><i class="fas fa-signal"></i><strong id="enabledLabel">Enabled:</strong> <span id="clientStatus">Loading...</span></p>
+            <p><i class="fas fa-rotate-right"></i><strong id="expireLabel">Expire:</strong> <span id="expireTime" title="GMT +5.30"></span></p>
+        </div>
+        <div class="section">
+            <h2 id="ipInfoHeading">IP Info</h2>
+            <p><i class="fas fa-globe"></i><strong id="ipAddressLabel">IP Address:</strong> <span id="userIP">Detecting...</span></p>
+            <p><i class="fas fa-map-marker-alt"></i><strong id="countryLabel">Country:</strong> <span id="userCountry">Detecting...</span></p>
+        </div>
+        <div class="section">
+            <h2 id="usageHeading">Usage</h2>
+            <p><i class="fas fa-upload"></i><strong id="uploadLabel">Upload:</strong> {{ (client.up / (1024 ** 3)) | round(2) }} GB</p>
+            <p><i class="fas fa-download"></i><strong id="downloadLabel">Download:</strong> {{ (client.down / (1024 ** 3)) | round(2) }} GB</p>
+            <p><i class="fas fa-database"></i><strong id="totalBandwidthLabel">Total Bandwidth:</strong>
+                {% if client.total == 0 %}
+                    <span id="unlimitedText">Unlimited</span>
+                {% else %}
+                    {{ (client.total / (1024 ** 3)) | round(2) }} GB
+                {% endif %}
+            </p>
+        </div>
+        <div class="section chart-container">
+            <h2 id="usageChartHeading">Usage Chart</h2>
+            <canvas id="usageChart"></canvas>
+        </div>
+        <footer>
+            <p id="footerText">Made with ❤️ by LeoX</p>
+        </footer>
     </div>
-    <div class="section">
-      <h2>Usage</h2>
-      <p><i class="fas fa-upload"></i><strong>Upload:</strong> {{ (client.up / (1024 ** 3)) | round(2) }} GB</p>
-      <p><i class="fas fa-download"></i><strong>Download:</strong> {{ (client.down / (1024 ** 3)) | round(2) }} GB</p>
-      <p><i class="fas fa-database"></i><strong>Total Bandwidth:</strong>
-        {% if client.total == 0 %}
-          Unlimited
-        {% else %}
-          {{ (client.total / (1024 ** 3)) | round(2) }} GB
-        {% endif %}
-      </p>
-    </div>
-    <div class="section chart-container">
-      <h2>Usage Chart</h2>
-      <canvas id="usageChart"></canvas>
-    </div>
-    <footer>
-      <p>Made with ❤️ by LeoX</p>
-    </footer>
-  </div>
-  <script>
-    let upGB = {{ (client.up / (1024 ** 3)) | round(2) }};
-    let downGB = {{ (client.down / (1024 ** 3)) | round(2) }};
-    let used = upGB + downGB;
-    let chartData = {
-      labels: ['Upload', 'Download'],
-      datasets: [{
-        label: 'Bandwidth Usage (GB)',
-        data: [upGB, downGB],
-        backgroundColor: ['#47B39C', '#EC6B56'],
-        borderColor: ['#388e3c', '#d32f2f'],
-        borderWidth: 1
-      }]
-    };
-    {% if client.total != 0 %}
-    let total = {{ (client.total / (1024 ** 3)) | round(2) }};
-    let remaining = total - used;
-    if (remaining > 0) {
-      chartData.labels.push('Remaining');
-      chartData.datasets[0].data.push(remaining);
-      chartData.datasets[0].backgroundColor.push('#FFC154');
-      chartData.datasets[0].borderColor.push('#616161');
-    }
-    {% endif %}
-    const config = {
-      type: 'pie',
-      data: chartData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              color: '#555',
-              font: {
-                family: 'Poppins',
-                size: 14
-              }
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                pageTitle: "Client Usage Statistics",
+                clientInfoHeading: "Client Info",
+                clientNameLabel: "Client Name:",
+                nodeLabel: "Node:",
+                enabledLabel: "Enabled:",
+                expireLabel: "Expire:",
+                ipInfoHeading: "IP Info",
+                ipAddressLabel: "IP Address:",
+                countryLabel: "Country:",
+                usageHeading: "Usage",
+                uploadLabel: "Upload:",
+                downloadLabel: "Download:",
+                totalBandwidthLabel: "Total Bandwidth:",
+                unlimitedText: "Unlimited",
+                usageChartHeading: "Usage Chart",
+                footerText: "Made with ❤️ by LeoX",
+                statusLoading: "Loading...",
+                statusEnabled: "Enabled",
+                statusExpired: "Expired",
+                statusBandwidthExceeded: "Bandwidth Exceeded",
+                statusExpiredBandwidthExceeded: "Expired/Bandwidth Exceeded",
+                ipDetecting: "Detecting...",
+                ipUnavailable: "Unavailable",
+                chartUploadLabel: "Upload",
+                chartDownloadLabel: "Download",
+                chartRemainingLabel: "Remaining",
+                chartBandwidthUsageLabel: "Bandwidth Usage (GB)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} GB`
+            },
+            si: {
+                pageTitle: "සේවාදායක භාවිත සංඛ්‍යාලේඛන",
+                clientInfoHeading: "සේවාදායක තොරතුරු",
+                clientNameLabel: "සේවාදායක නාමය:",
+                nodeLabel: "නෝඩ්:",
+                enabledLabel: "ක්‍රියාකාරී:",
+                expireLabel: "කල් ඉකුත්වීම:",
+                ipInfoHeading: "IP තොරතුරු",
+                ipAddressLabel: "IP ලිපිනය:",
+                countryLabel: "රට:",
+                usageHeading: "භාවිතය",
+                uploadLabel: "උඩුගත කිරීම:",
+                downloadLabel: "බාගත කිරීම:",
+                totalBandwidthLabel: "මුළු කලාප පළල:",
+                unlimitedText: "අසීමිත",
+                usageChartHeading: "භාවිත ප්‍රස්ථාරය",
+                footerText: "LeoX විසින් ❤️ සමඟින් සාදන ලදී",
+                statusLoading: "පූරණය වෙමින්...",
+                statusEnabled: "ක්‍රියාකාරී",
+                statusExpired: "කල් ඉකුත් වී ඇත",
+                statusBandwidthExceeded: "කලාප පළල ඉක්මවා ඇත",
+                statusExpiredBandwidthExceeded: "කල් ඉකුත් වූ/කලාප පළල ඉක්මවූ",
+                ipDetecting: "හඳුනාගනිමින්...",
+                ipUnavailable: "නොමැත",
+                chartUploadLabel: "උඩුගත කිරීම",
+                chartDownloadLabel: "බාගත කිරීම",
+                chartRemainingLabel: "ඉතිරි",
+                chartBandwidthUsageLabel: "කලාප පළල භාවිතය (GB)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} GB`
+            },
+            es: { // Spanish
+                pageTitle: "Estadísticas de Uso del Cliente",
+                clientInfoHeading: "Información del Cliente",
+                clientNameLabel: "Nombre del Cliente:",
+                nodeLabel: "Nodo:",
+                enabledLabel: "Habilitado:",
+                expireLabel: "Vencimiento:",
+                ipInfoHeading: "Información de IP",
+                ipAddressLabel: "Dirección IP:",
+                countryLabel: "País:",
+                usageHeading: "Uso",
+                uploadLabel: "Subida:",
+                downloadLabel: "Descarga:",
+                totalBandwidthLabel: "Ancho de Banda Total:",
+                unlimitedText: "Ilimitado",
+                usageChartHeading: "Gráfico de Uso",
+                footerText: "Hecho con ❤️ por LeoX",
+                statusLoading: "Cargando...",
+                statusEnabled: "Habilitado",
+                statusExpired: "Vencido",
+                statusBandwidthExceeded: "Ancho de Banda Excedido",
+                statusExpiredBandwidthExceeded: "Vencido/Ancho de Banda Excedido",
+                ipDetecting: "Detectando...",
+                ipUnavailable: "No Disponible",
+                chartUploadLabel: "Subida",
+                chartDownloadLabel: "Descarga",
+                chartRemainingLabel: "Restante",
+                chartBandwidthUsageLabel: "Uso de Ancho de Banda (GB)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} GB`
+            },
+            de: { // German
+                pageTitle: "Client-Nutzungsstatistiken",
+                clientInfoHeading: "Client-Informationen",
+                clientNameLabel: "Client-Name:",
+                nodeLabel: "Knoten:",
+                enabledLabel: "Aktiviert:",
+                expireLabel: "Ablaufdatum:",
+                ipInfoHeading: "IP-Informationen",
+                ipAddressLabel: "IP-Adresse:",
+                countryLabel: "Land:",
+                usageHeading: "Nutzung",
+                uploadLabel: "Upload:",
+                downloadLabel: "Download:",
+                totalBandwidthLabel: "Gesamtbandbreite:",
+                unlimitedText: "Unbegrenzt",
+                usageChartHeading: "Nutzungsdiagramm",
+                footerText: "Mit ❤️ von LeoX erstellt",
+                statusLoading: "Laden...",
+                statusEnabled: "Aktiviert",
+                statusExpired: "Abgelaufen",
+                statusBandwidthExceeded: "Bandbreite Überschritten",
+                statusExpiredBandwidthExceeded: "Abgelaufen/Bandbreite Überschritten",
+                ipDetecting: "Erkennen...",
+                ipUnavailable: "Nicht Verfügbar",
+                chartUploadLabel: "Upload",
+                chartDownloadLabel: "Download",
+                chartRemainingLabel: "Verbleibend",
+                chartBandwidthUsageLabel: "Bandbreitennutzung (GB)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} GB`
+            },
+            fr: { // French
+                pageTitle: "Statistiques d'Utilisation du Client",
+                clientInfoHeading: "Infos Client",
+                clientNameLabel: "Nom du Client:",
+                nodeLabel: "Nœud:",
+                enabledLabel: "Activé:",
+                expireLabel: "Expiration:",
+                ipInfoHeading: "Infos IP",
+                ipAddressLabel: "Adresse IP:",
+                countryLabel: "Pays:",
+                usageHeading: "Utilisation",
+                uploadLabel: "Téléchargement (envoi):",
+                downloadLabel: "Téléchargement (réception):",
+                totalBandwidthLabel: "Bande Passante Totale:",
+                unlimitedText: "Illimité",
+                usageChartHeading: "Graphique d'Utilisation",
+                footerText: "Fait avec ❤️ par LeoX",
+                statusLoading: "Chargement...",
+                statusEnabled: "Activé",
+                statusExpired: "Expiré",
+                statusBandwidthExceeded: "Bande Passante Dépassée",
+                statusExpiredBandwidthExceeded: "Expiré/Bande Passante Dépassée",
+                ipDetecting: "Détection...",
+                ipUnavailable: "Non Disponible",
+                chartUploadLabel: "Envoi",
+                chartDownloadLabel: "Réception",
+                chartRemainingLabel: "Restant",
+                chartBandwidthUsageLabel: "Utilisation de la Bande Passante (Go)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} Go`
+            },
+            zh: { // Simplified Chinese
+                pageTitle: "客户端使用统计",
+                clientInfoHeading: "客户端信息",
+                clientNameLabel: "客户端名称:",
+                nodeLabel: "节点:",
+                enabledLabel: "已启用:",
+                expireLabel: "到期时间:",
+                ipInfoHeading: "IP信息",
+                ipAddressLabel: "IP地址:",
+                countryLabel: "国家:",
+                usageHeading: "使用情况",
+                uploadLabel: "上传:",
+                downloadLabel: "下载:",
+                totalBandwidthLabel: "总带宽:",
+                unlimitedText: "无限",
+                usageChartHeading: "使用图表",
+                footerText: "由 LeoX 用 ❤️ 制作",
+                statusLoading: "加载中...",
+                statusEnabled: "已启用",
+                statusExpired: "已过期",
+                statusBandwidthExceeded: "带宽超出",
+                statusExpiredBandwidthExceeded: "已过期/带宽超出",
+                ipDetecting: "检测中...",
+                ipUnavailable: "不可用",
+                chartUploadLabel: "上传",
+                chartDownloadLabel: "下载",
+                chartRemainingLabel: "剩余",
+                chartBandwidthUsageLabel: "带宽使用 (GB)",
+                chartTooltipLabel: (label, value) => `${label}: ${value} GB`
             }
-          },
-          tooltip: {
-            backgroundColor: '#333',
-            callbacks: {
-              label: function (tooltipItem) {
-                return tooltipItem.label + ': ' + tooltipItem.raw + ' GB';
-              }
+        };
+
+        const languageSelect = document.getElementById('language-select');
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        let myChart; // Declare chart globally to be able to destroy and re-create
+
+        // These variables are populated by Jinja2 on the server-side
+        // and will be available as numbers when the JavaScript runs.
+        const clientUpGB = {{ (client.up / (1024 ** 3)) | round(2) }};
+        const clientDownGB = {{ (client.down / (1024 ** 3)) | round(2) }};
+        const clientTotalGB = {{ (client.total / (1024 ** 3)) | round(2) }}; // Will be 0 if client.total was 0
+        const clientExpiryTime = {{ client.expiry_time }};
+
+        // Determine initial client status (these are global for updateClientStatusText)
+        const currentTime = Date.now();
+        const isExpired = clientExpiryTime !== 0 && currentTime > clientExpiryTime;
+        const isBandwidthExceeded = clientTotalGB !== 0 && (clientUpGB + clientDownGB) > clientTotalGB;
+
+        function getClientStatusKey(isExpired, isBandwidthExceeded) {
+            if (isExpired && isBandwidthExceeded) {
+                return 'statusExpiredBandwidthExceeded';
+            } else if (isExpired) {
+                return 'statusExpired';
+            } else if (isBandwidthExceeded) {
+                return 'statusBandwidthExceeded';
+            } else {
+                return 'statusEnabled';
             }
-          }
         }
-      }
-    };
-    const ctx = document.getElementById('usageChart').getContext('2d');
-    new Chart(ctx, config);
-    const expiryTime = {{ client.expiry_time }};
-    function formatExpiryTime(timestamp) {
-      if (timestamp === 0) return 'Never';
-      const date = new Date(timestamp);
-      return date.toLocaleString();
-    }
-    document.getElementById('expireTime').textContent = formatExpiryTime(expiryTime);
-    const currentTime = Date.now();
-    const isExpired = expiryTime !== 0 && currentTime > expiryTime;
-    const isBandwidthExceeded = {{ client.total }} !== 0 && used > {{ client.total }};
-    let status = 'Enabled';
-    if (isExpired && isBandwidthExceeded) {
-      status = 'Expired/Bandwidth Exceeded';
-    } else if (isExpired) {
-      status = 'Expired';
-    } else if (isBandwidthExceeded) {
-      status = 'Bandwidth Exceeded';
-    }
-    document.getElementById('clientStatus').textContent = status;
-    fetch('https://ipapi.co/json/')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('userIP').textContent = data.ip || 'Unavailable';
-        document.getElementById('userCountry').textContent = data.country_name || 'Unavailable';
-      })
-      .catch(() => {
-        document.getElementById('userIP').textContent = 'Unavailable';
-        document.getElementById('userCountry').textContent = 'Unavailable';
-      });
-  </script>
+
+        // Function to set the language
+        function setLanguage(lang) {
+            document.getElementById('pageTitle').textContent = translations[lang].pageTitle;
+            document.getElementById('clientInfoHeading').textContent = translations[lang].clientInfoHeading;
+            document.getElementById('clientNameLabel').textContent = translations[lang].clientNameLabel;
+            document.getElementById('nodeLabel').textContent = translations[lang].nodeLabel;
+            document.getElementById('enabledLabel').textContent = translations[lang].enabledLabel;
+            document.getElementById('expireLabel').textContent = translations[lang].expireLabel;
+            document.getElementById('ipInfoHeading').textContent = translations[lang].ipInfoHeading;
+            document.getElementById('ipAddressLabel').textContent = translations[lang].ipAddressLabel;
+            document.getElementById('countryLabel').textContent = translations[lang].countryLabel;
+            document.getElementById('usageHeading').textContent = translations[lang].usageHeading;
+            document.getElementById('uploadLabel').textContent = translations[lang].uploadLabel;
+            document.getElementById('downloadLabel').textContent = translations[lang].downloadLabel;
+            document.getElementById('totalBandwidthLabel').textContent = translations[lang].totalBandwidthLabel;
+            
+            const unlimitedTextElement = document.getElementById('unlimitedText');
+            if (unlimitedTextElement) {
+                unlimitedTextElement.textContent = translations[lang].unlimitedText;
+            }
+            document.getElementById('usageChartHeading').textContent = translations[lang].usageChartHeading;
+            document.getElementById('footerText').textContent = translations[lang].footerText;
+
+            // Update dynamic status texts
+            updateClientStatusText(lang);
+            updateIpInfoText(lang);
+
+            // Re-render chart for translated labels
+            if (myChart) {
+                myChart.destroy(); // Destroy previous chart instance
+            }
+            createChart(lang); // Create new chart with updated labels
+
+            localStorage.setItem('selectedLanguage', lang);
+        }
+
+        // Function to update client status text based on current language
+        function updateClientStatusText(lang) {
+            const clientStatusElement = document.getElementById('clientStatus');
+            const currentStatusKey = getClientStatusKey(isExpired, isBandwidthExceeded);
+            clientStatusElement.textContent = translations[lang][currentStatusKey];
+        }
+
+        // Function to update IP info text based on current language
+        function updateIpInfoText(lang) {
+            const userIPElement = document.getElementById('userIP');
+            const userCountryElement = document.getElementById('userCountry');
+
+            // Only update if the text is one of the dynamic states ('Detecting...' or 'Unavailable')
+            // Compare against a known language (e.g., English) to know which state it's in before translating
+            const currentIPText = userIPElement.textContent;
+            if (currentIPText === translations['en'].ipDetecting) {
+                userIPElement.textContent = translations[lang].ipDetecting;
+            } else if (currentIPText === translations['en'].ipUnavailable) {
+                userIPElement.textContent = translations[lang].ipUnavailable;
+            }
+
+            const currentCountryText = userCountryElement.textContent;
+            if (currentCountryText === translations['en'].ipDetecting) {
+                userCountryElement.textContent = translations[lang].ipDetecting;
+            } else if (currentCountryText === translations['en'].ipUnavailable) {
+                userCountryElement.textContent = translations[lang].ipUnavailable;
+            }
+        }
+
+        // Function to set the theme
+        function setTheme(isDarkMode) {
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+            // Update chart colors regardless, as colors are pulled from CSS variables
+            if (myChart) {
+                myChart.options.plugins.legend.labels.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-legend-color');
+                myChart.options.plugins.tooltip.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tooltip-bg');
+                myChart.update(); // Update existing chart without destroying
+            }
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Function to create or update the chart
+        function createChart(lang) {
+            let used_chart = clientUpGB + clientDownGB;
+
+            let chartData = {
+                labels: [translations[lang].chartUploadLabel, translations[lang].chartDownloadLabel],
+                datasets: [{
+                    label: translations[lang].chartBandwidthUsageLabel || 'Bandwidth Usage (GB)', // Fallback
+                    data: [clientUpGB, clientDownGB],
+                    backgroundColor: ['#47B39C', '#EC6B56'],
+                    borderColor: ['#388e3c', '#d32f2f'],
+                    borderWidth: 1
+                }]
+            };
+
+            // Only add 'Remaining' if total bandwidth is not 0 (unlimited)
+            if (clientTotalGB !== 0) {
+                let remaining_chart = clientTotalGB - used_chart;
+                if (remaining_chart > 0) { // Only add if there's actual remaining data
+                    chartData.labels.push(translations[lang].chartRemainingLabel);
+                    chartData.datasets[0].data.push(remaining_chart);
+                    chartData.datasets[0].backgroundColor.push('#FFC154');
+                    chartData.datasets[0].borderColor.push('#616161');
+                }
+            }
+
+            const config = {
+                type: 'pie',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--chart-legend-color'),
+                                font: {
+                                    family: 'Poppins',
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-tooltip-bg'),
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return translations[lang].chartTooltipLabel(tooltipItem.label, tooltipItem.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            myChart = new Chart(ctx, config);
+        }
+
+        // Format expiry time (this runs once on page load)
+        function formatExpiryTime(timestamp) {
+            if (timestamp === 0) return 'Never';
+            const date = new Date(timestamp);
+            // Format for Sri Lankan time (GMT +5:30)
+            return date.toLocaleString('en-LK', { timeZone: 'Asia/Colombo' });
+        }
+        document.getElementById('expireTime').textContent = formatExpiryTime(clientExpiryTime);
+
+        // IP API fetch (moved outside createChart, as it's independent of language/theme)
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                const lang = languageSelect.value;
+                document.getElementById('userIP').textContent = data.ip || translations[lang].ipUnavailable;
+                document.getElementById('userCountry').textContent = data.country_name || translations[lang].ipUnavailable;
+            })
+            .catch(() => {
+                const lang = languageSelect.value;
+                document.getElementById('userIP').textContent = translations[lang].ipUnavailable;
+                document.getElementById('userCountry').textContent = translations[lang].ipUnavailable;
+            });
+
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved language
+            const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+            languageSelect.value = savedLanguage;
+            setLanguage(savedLanguage); // This will call createChart with the correct language
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('darkMode') === 'true';
+            themeToggle.checked = savedTheme;
+            setTheme(savedTheme);
+        });
+
+        // Event listener for language change
+        languageSelect.addEventListener('change', (event) => {
+            setLanguage(event.target.value);
+        });
+
+        // Event listener for theme toggle
+        themeToggle.addEventListener('change', (event) => {
+            setTheme(event.target.checked);
+        });
+    </script>
 </body>
 </html>

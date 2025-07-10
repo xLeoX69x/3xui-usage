@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Usage Statistics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(270deg, #e0f7fa, #ffffff, #e0f7fa);
+      background-size: 600% 600%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 1200px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .section {
+      background-color: #f9fbfd;
+      border: 1px solid #b3e5fc;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    h2 {
+      color: #0288d1;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 1.4em;
+    }
+    p {
+      font-size: 1.05em;
+      color: #555;
+    }
+    p i {
+      color: #0288d1;
+      margin-right: 8px;
+    }
+    .chart-container {
+      width: 100%;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #555;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section">
+      <h2>Client Info</h2>
+      <p><i class="fas fa-envelope"></i><strong>Client Name:</strong> {{ client.email }}</p>
+      <p><i class="fas fa-id-badge"></i><strong>Node:</strong> {{ node }}</p>
+      <p><i class="fas fa-signal"></i><strong>Enabled:</strong> <span id="clientStatus">Loading...</span></p>
+      <p><i class="fas fa-rotate-right"></i><strong>Expire:</strong> <span id="expireTime" title="GMT +5.30"></span></p>
+    </div>
+    <div class="section">
+      <h2>IP Info</h2>
+      <p><i class="fas fa-globe"></i><strong>IP Address:</strong> <span id="userIP">Detecting...</span></p>
+      <p><i class="fas fa-map-marker-alt"></i><strong>Country:</strong> <span id="userCountry">Detecting...</span></p>
+    </div>
+    <div class="section">
+      <h2>Usage</h2>
+      <p><i class="fas fa-upload"></i><strong>Upload:</strong> {{ (client.up / (1024 ** 3)) | round(2) }} GB</p>
+      <p><i class="fas fa-download"></i><strong>Download:</strong> {{ (client.down / (1024 ** 3)) | round(2) }} GB</p>
+      <p><i class="fas fa-database"></i><strong>Total Bandwidth:</strong>
+        {% if client.total == 0 %}
+          Unlimited
+        {% else %}
+          {{ (client.total / (1024 ** 3)) | round(2) }} GB
+        {% endif %}
+      </p>
+    </div>
+    <div class="section chart-container">
+      <h2>Usage Chart</h2>
+      <canvas id="usageChart"></canvas>
+    </div>
+    <footer>
+      <p>Made with ❤️ by LeoX</p>
+    </footer>
+  </div>
+  <script>
+    let upGB = {{ (client.up / (1024 ** 3)) | round(2) }};
+    let downGB = {{ (client.down / (1024 ** 3)) | round(2) }};
+    let used = upGB + downGB;
+    let chartData = {
+      labels: ['Upload', 'Download'],
+      datasets: [{
+        label: 'Bandwidth Usage (GB)',
+        data: [upGB, downGB],
+        backgroundColor: ['#47B39C', '#EC6B56'],
+        borderColor: ['#388e3c', '#d32f2f'],
+        borderWidth: 1
+      }]
+    };
+    {% if client.total != 0 %}
+    let total = {{ (client.total / (1024 ** 3)) | round(2) }};
+    let remaining = total - used;
+    if (remaining > 0) {
+      chartData.labels.push('Remaining');
+      chartData.datasets[0].data.push(remaining);
+      chartData.datasets[0].backgroundColor.push('#FFC154');
+      chartData.datasets[0].borderColor.push('#616161');
+    }
+    {% endif %}
+    const config = {
+      type: 'pie',
+      data: chartData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#555',
+              font: {
+                family: 'Poppins',
+                size: 14
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#333',
+            callbacks: {
+              label: function (tooltipItem) {
+                return tooltipItem.label + ': ' + tooltipItem.raw + ' GB';
+              }
+            }
+          }
+        }
+      }
+    };
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    new Chart(ctx, config);
+    const expiryTime = {{ client.expiry_time }};
+    function formatExpiryTime(timestamp) {
+      if (timestamp === 0) return 'Never';
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    }
+    document.getElementById('expireTime').textContent = formatExpiryTime(expiryTime);
+    const currentTime = Date.now();
+    const isExpired = expiryTime !== 0 && currentTime > expiryTime;
+    const isBandwidthExceeded = {{ client.total }} !== 0 && used > {{ client.total }};
+    let status = 'Enabled';
+    if (isExpired && isBandwidthExceeded) {
+      status = 'Expired/Bandwidth Exceeded';
+    } else if (isExpired) {
+      status = 'Expired';
+    } else if (isBandwidthExceeded) {
+      status = 'Bandwidth Exceeded';
+    }
+    document.getElementById('clientStatus').textContent = status;
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('userIP').textContent = data.ip || 'Unavailable';
+        document.getElementById('userCountry').textContent = data.country_name || 'Unavailable';
+      })
+      .catch(() => {
+        document.getElementById('userIP').textContent = 'Unavailable';
+        document.getElementById('userCountry').textContent = 'Unavailable';
+      });
+  </script>
+</body>
+</html>
